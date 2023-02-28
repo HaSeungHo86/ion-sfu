@@ -169,6 +169,9 @@ func (s *Subscriber) RemoveDownTrack(streamID string, downTrack *DownTrack) {
 			dts = dts[:len(dts)-1]
 			s.tracks[streamID] = dts
 		}
+		if len(s.tracks[streamID]) == 0 {
+			delete(s.tracks, streamID)
+		}
 	}
 }
 

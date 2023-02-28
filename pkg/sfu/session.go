@@ -279,6 +279,8 @@ func (s *SessionLocal) Subscribe(peer Peer) {
 
 	// Subscribe to publisher streams
 	for _, p := range peers {
+		Logger.V(0).Info("subscribe", "my_id", peer.ID(), "peer_id", p.ID(),
+			"getReceiver", p.Publisher().GetRouter().GetReceiver())
 		err := p.Publisher().GetRouter().AddDownTracks(peer.Subscriber(), nil)
 		if err != nil {
 			Logger.Error(err, "Subscribing to Router err")

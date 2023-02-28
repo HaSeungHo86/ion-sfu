@@ -122,11 +122,18 @@ func (p *PeerLocal) Join(sid, uid string, config ...JoinConfig) error {
 			}
 
 			Logger.V(1).Info("Negotiation needed", "peer_id", p.id)
+
 			offer, err := p.subscriber.CreateOffer()
 			if err != nil {
 				Logger.Error(err, "CreateOffer error")
 				return
 			}
+
+			Logger.V(0).Info(p.id, "track_len", len(p.subscriber.tracks), "tracks", p.subscriber.tracks, "GetTransceivers", p.subscriber.pc.GetTransceivers(),
+				"receivers", p.subscriber.pc.GetReceivers(), "sedner", p.subscriber.pc.GetSenders(),
+				"peer connection state", p.subscriber.pc.ConnectionState(),
+				"offer", offer,
+			)
 
 			p.remoteAnswerPending = true
 			if p.OnOffer != nil && !p.closed.get() {
@@ -280,6 +287,7 @@ func (p *PeerLocal) Close() error {
 	}
 
 	if p.session != nil {
+		Logger.V(0).Info("close", "p_id", p.id, "s_id", p.session.ID())
 		p.session.RemovePeer(p)
 	}
 	if p.publisher != nil {

@@ -1,6 +1,7 @@
 package sfu
 
 import (
+	"fmt"
 	"sync"
 	"sync/atomic"
 
@@ -167,6 +168,7 @@ func (r *router) AddReceiver(receiver *webrtc.RTPReceiver, track *webrtc.TrackRe
 		r.receivers[trackID] = recv
 		recv.SetRTCPCh(r.rtcpCh)
 		recv.OnCloseHandler(func() {
+			fmt.Println("On Close Track.", track.ID())
 			if r.config.WithStats {
 				if track.Kind() == webrtc.RTPCodecTypeVideo {
 					stats.VideoTracks.Dec()
@@ -267,6 +269,13 @@ func (r *router) AddDownTrack(sub *Subscriber, recv Receiver) (*DownTrack, error
 
 	// nolint:scopelint
 	downTrack.OnCloseHandler(func() {
+		Logger.V(0).Info(sub.id, "track_id", downTrack.id, "kind", downTrack.Kind(),
+			"trans", sub.pc.GetTransceivers(),
+			"receiver", sub.pc.GetReceivers(),
+			"senders", sub.pc.GetSenders(),
+			"downTracks", sub.DownTracks(),
+			"tracks", sub.tracks,
+		)
 		if sub.pc.ConnectionState() != webrtc.PeerConnectionStateClosed {
 			if err := sub.pc.RemoveTrack(downTrack.transceiver.Sender()); err != nil {
 				if err == webrtc.ErrConnectionClosed {
@@ -275,7 +284,7 @@ func (r *router) AddDownTrack(sub *Subscriber, recv Receiver) (*DownTrack, error
 				Logger.Error(err, "Error closing down track")
 			} else {
 				sub.RemoveDownTrack(recv.StreamID(), downTrack)
-				sub.negotiate()
+				sub.Negotiate()
 			}
 		}
 	})

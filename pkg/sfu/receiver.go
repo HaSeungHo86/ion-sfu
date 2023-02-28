@@ -335,7 +335,7 @@ func (w *WebRTCReceiver) writeRTP(layer int) {
 	defer func() {
 		w.closeOnce.Do(func() {
 			w.closed.set(true)
-			w.closeTracks()
+			w.CloseTracks()
 		})
 	}()
 
@@ -383,7 +383,7 @@ func (w *WebRTCReceiver) writeRTP(layer int) {
 }
 
 // closeTracks close all tracks from Receiver
-func (w *WebRTCReceiver) closeTracks() {
+func (w *WebRTCReceiver) CloseTracks() {
 	for idx, a := range w.available {
 		if !a.get() {
 			continue
