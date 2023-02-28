@@ -1,0 +1,16 @@
+services:
+  sfu:
+    build: .
+    image: my-ion-sfu
+    #image: pionwebrtc/ion-sfu:latest-jsonrpc
+    restart: always
+    environment:
+      - gaddr=0.0.0.0:50051
+      - jaddr=0.0.0.0:7000
+    volumes:
+      - "./config.toml:/ion-sfu/config.toml"
+    ports:
+      - 7000:7000
+      - 50051:50051
+      - 5000-5200:5000-5200/udp
+
